@@ -1,69 +1,99 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { JobCard } from "@/components/JobCard";
+import { SummaryTable } from "@/components/SummaryTable";
+import { WallPanel } from "@/components/WallPanel";
+import { computeJob, computeTotal, lastEnteredMonth } from "@/lib/calc";
+import { yen } from "@/lib/format";
+import { useTaxData } from "@/lib/useTaxData";
 
 export default function Home() {
+  const [year, setYear] = useState(() => new Date().getFullYear());
+  const data = useTaxData(year);
+  const [newName, setNewName] = useState("");
+
+  const perJob = data.jobs.map(computeJob);
+  const total = computeTotal(perJob);
+  const last = lastEnteredMonth(perJob);
+  const current = last ? total[last - 1].cumulative : 0;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="mx-auto w-full max-w-5xl space-y-8 px-4 py-8">
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">バイト年収の壁チェック</h1>
+          <p className="mt-1 text-sm text-muted">
+            各バイト先の課税対象額を入力すると、合計と累計を計算します。データはこのブラウザにだけ保存されます。
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="flex items-center gap-1">
+          <button className="rounded px-2 py-1 hover:bg-line" aria-label="前の年" onClick={() => setYear(year - 1)}>
+            ‹
+          </button>
+          <span className="text-lg font-semibold tabular-nums">{year}年</span>
+          <button className="rounded px-2 py-1 hover:bg-line" aria-label="次の年" onClick={() => setYear(year + 1)}>
+            ›
+          </button>
         </div>
-      </main>
-    </div>
+      </header>
+
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-lg font-semibold">壁までの残り</h2>
+          <p className="text-sm text-muted">
+            {last ? `${last}月までの全バイト累計` : "まだ入力がありません"}
+            <span className="ml-2 text-2xl font-bold tabular-nums text-fg">{yen(current)}</span>
+          </p>
+        </div>
+        <WallPanel current={current} walls={data.walls} onChange={data.setWalls} onAdd={data.addWall} />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">バイト先ごとの入力</h2>
+        <p className="text-sm text-muted">
+          月ごとに「月額」（その月の課税対象額）か「累計」（その月までの累計額）を選んで入力します。累計で入力した月は、直前の月までの累計との差がその月の額になります。未入力の月は0円として扱います。
+        </p>
+        <div className="grid gap-4 lg:grid-cols-2">
+          {data.jobs.map((job, i) => (
+            <JobCard
+              key={job.id}
+              job={job}
+              results={perJob[i]}
+              onRename={(name) => data.renameJob(job.id, name)}
+              onDefaultMode={(mode) => data.setDefaultMode(job.id, mode)}
+              onRemove={() => data.removeJob(job.id)}
+              onEntry={(month, entry) => data.setEntry(job.id, month, entry)}
+            />
+          ))}
+        </div>
+        <form
+          className="flex gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            data.addJob(newName.trim() || `バイト先${data.jobs.length + 1}`);
+            setNewName("");
+          }}
+        >
+          <input
+            aria-label="追加するバイト先の名前"
+            placeholder="バイト先の名前"
+            className="min-w-0 flex-1 rounded border border-line bg-surface px-3 py-2"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <button className="rounded bg-accent px-4 py-2 font-medium text-on-accent hover:opacity-90">
+            バイト先を追加
+          </button>
+        </form>
+      </section>
+
+      {data.jobs.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">月別の集計</h2>
+          <SummaryTable jobs={data.jobs} perJob={perJob} total={total} />
+        </section>
+      )}
+    </main>
   );
 }

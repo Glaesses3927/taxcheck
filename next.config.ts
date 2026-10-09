@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // サーバー処理は不要なので静的書き出し（out/）して Amplify Hosting で配信する
+  output: "export",
   turbopack: {
     rules: {
       "*.css": {
