@@ -22,7 +22,7 @@ export default function Home() {
     <main className="mx-auto w-full max-w-5xl space-y-8 px-4 py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">バイト年収の壁チェック</h1>
+          <h1 className="text-2xl font-bold">TaxCheck</h1>
           <p className="mt-1 text-sm text-muted">
             各バイト先の課税対象額を入力すると、合計と累計を計算します。データはこのブラウザにだけ保存されます。
           </p>

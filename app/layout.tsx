@@ -9,7 +9,7 @@ const notoSansJp = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "バイト年収の壁チェック",
+  title: "TaxCheck",
   description: "複数のバイト先の課税対象額を合計し、年収の壁までの残りを確認します。",
 };
 
