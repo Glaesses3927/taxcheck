@@ -22,6 +22,12 @@
 
 データはブラウザの localStorage（キー `taxcheck:v1`）にだけ保存されます。サーバーには送信されず、別の端末やブラウザとは共有されません。ブラウザのサイトデータを消すとデータも消えます。
 
+## アクセス解析
+
+Google Analytics 4 を `@next/third-parties` の `GoogleAnalytics` で読み込んでいます（`app/layout.tsx`）。測定 ID はビルド時の環境変数 `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` から読み、未設定のときは読み込みません。ページビューなどの標準の計測だけで、入力した金額は送信しません。
+
+Amplify では、アプリの環境変数に `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` を設定してから再ビルドします。
+
 ## 開発
 
 Node.js 22 で動作を確認しています。
