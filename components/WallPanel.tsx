@@ -56,7 +56,7 @@ export function WallPanel({
                     style={{ width: `${ratio * 100}%` }}
                   />
                 </div>
-                <span className={`w-36 text-right tabular-nums ${rest < 0 ? "font-semibold text-danger" : ""}`}>
+                <span className={`w-36 shrink-0 whitespace-nowrap text-right tabular-nums ${rest < 0 ? "font-semibold text-danger" : ""}`}>
                   {rest < 0 ? `${yen(-rest)} 超過` : `残り ${yen(rest)}`}
                 </span>
               </div>

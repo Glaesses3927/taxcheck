@@ -54,7 +54,7 @@ export function JobCard({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[480px] text-sm">
+        <table className="w-full min-w-[480px] whitespace-nowrap text-sm">
           <thead className="text-muted">
             <tr className="border-b border-line">
               <th className="py-1 text-left font-normal">月</th>
