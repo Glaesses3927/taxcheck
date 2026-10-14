@@ -21,7 +21,7 @@ export function WallPanel({
     onChange(walls.map((w) => (w.id === id ? { ...w, ...patch } : w)));
 
   return (
-    <div className="rounded-lg border border-line bg-surface p-4">
+    <div className="rounded-xl border border-line bg-surface shadow-sm p-4">
       <ul className="space-y-4">
         {walls.map((w) => {
           const rest = w.amount - current;

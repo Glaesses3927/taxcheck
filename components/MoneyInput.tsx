@@ -23,7 +23,7 @@ export function MoneyInput({
       type="text"
       inputMode="numeric"
       aria-label={ariaLabel}
-      className={`${className || "w-full"} rounded border border-line bg-surface px-2 py-1 text-right tabular-nums focus:outline-2 focus:outline-accent`}
+      className={`${className || "w-full"} rounded-md border border-line bg-surface px-2 py-1 text-right tabular-nums focus:outline-2 focus:outline-accent`}
       value={draft ?? fmt(value)}
       onFocus={() => setDraft(value == null ? "" : String(value))}
       onBlur={() => setDraft(null)}

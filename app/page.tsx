@@ -9,7 +9,8 @@ import { yen } from "@/lib/format";
 import { useTaxData } from "@/lib/useTaxData";
 
 export default function Home() {
-  const [year, setYear] = useState(() => new Date().getFullYear());
+  const [thisYear] = useState(() => new Date().getFullYear());
+  const [year, setYear] = useState(thisYear);
   const data = useTaxData(year);
   const [newName, setNewName] = useState("");
 
@@ -27,14 +28,17 @@ export default function Home() {
             各バイト先の課税対象額を入力すると、合計と累計を計算します。データはこのブラウザにだけ保存されます。
           </p>
         </div>
-        <div className="flex items-center gap-1">
-          <button className="rounded px-2 py-1 hover:bg-line" aria-label="前の年" onClick={() => setYear(year - 1)}>
-            ‹
-          </button>
-          <span className="text-lg font-semibold tabular-nums">{year}年</span>
-          <button className="rounded px-2 py-1 hover:bg-line" aria-label="次の年" onClick={() => setYear(year + 1)}>
-            ›
-          </button>
+        <div className="flex flex-col items-end gap-1">
+          <div className="inline-flex items-center rounded-full border border-line bg-surface p-1 shadow-sm">
+            <YearButton label="前の年" onClick={() => setYear(year - 1)} path="M15 18l-6-6 6-6" />
+            <span className="min-w-20 px-2 text-center text-lg font-semibold tabular-nums">{year}年</span>
+            <YearButton label="次の年" onClick={() => setYear(year + 1)} path="M9 6l6 6-6 6" />
+          </div>
+          {year !== thisYear && (
+            <button className="text-xs text-accent hover:underline" onClick={() => setYear(thisYear)}>
+              今年（{thisYear}年）に戻る
+            </button>
+          )}
         </div>
       </header>
 
@@ -54,7 +58,7 @@ export default function Home() {
         <p className="text-sm text-muted">
           月ごとに「月額」（その月の課税対象額）か「累計」（その月までの累計額）を選んで入力します。累計で入力した月は、直前の月までの累計との差がその月の額になります。未入力の月は0円として扱います。
         </p>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {data.jobs.map((job, i) => (
             <JobCard
               key={job.id}
@@ -78,11 +82,11 @@ export default function Home() {
           <input
             aria-label="追加するバイト先の名前"
             placeholder="バイト先の名前"
-            className="min-w-0 flex-1 rounded border border-line bg-surface px-3 py-2"
+            className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 shadow-sm"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
           />
-          <button className="rounded bg-accent px-4 py-2 font-medium text-on-accent hover:opacity-90">
+          <button className="rounded-lg bg-accent px-4 py-2 font-medium text-on-accent shadow-sm transition-opacity hover:opacity-90">
             バイト先を追加
           </button>
         </form>
@@ -95,5 +99,20 @@ export default function Home() {
         </section>
       )}
     </main>
+  );
+}
+
+function YearButton({ label, path, onClick }: { label: string; path: string; onClick: () => void }) {
+  return (
+    <button
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      className="flex size-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-accent/10 hover:text-accent active:bg-accent/20"
+    >
+      <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d={path} />
+      </svg>
+    </button>
   );
 }
